@@ -64,7 +64,7 @@ Feature: Teacher can list and filter the course participants with the fast parti
     Given I am on the "C1" "Course" page logged in as "teacher1"
     And I navigate to "Reports" in current page administration
     And I click on "Fast participants" "link" in the "region-main" "region"
-    When I set the field "id_searchfield" to "Full name"
+    When I set the field "id_searchfield" to "User full name"
     And I set the field "id_search" to "ria sou"
     And I click on "Search" "button" in the "#report-fastparticipants-filter" "css_element"
     Then I should see "Maria Souza" in the "report-fastparticipants-participants" "table"

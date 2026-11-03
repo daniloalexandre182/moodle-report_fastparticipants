@@ -57,7 +57,7 @@ Feature: Teacher can manage participants from the fast participants report
     And I navigate to "Reports" in current page administration
     And I click on "Fast participants" "link" in the "region-main" "region"
     And I click on "Search" "button" in the "#report-fastparticipants-filter" "css_element"
-    And I set the field "Select Maria Souza" to "1"
+    And I set the field "Select 'Maria Souza'" to "1"
     When I set the field "With selected users..." to "Send a message"
     Then "Send message to 1 person" "dialogue" should exist
     And I set the following fields to these values:
@@ -70,7 +70,7 @@ Feature: Teacher can manage participants from the fast participants report
     And I navigate to "Reports" in current page administration
     And I click on "Fast participants" "link" in the "region-main" "region"
     And I click on "Search" "button" in the "#report-fastparticipants-filter" "css_element"
-    And I set the field "Select Maria Souza" to "1"
+    And I set the field "Select 'Maria Souza'" to "1"
     When I set the field "With selected users..." to "Add a new note"
     Then "Add a new note to 1 person" "dialogue" should exist
     And I set the field "bulk-note" to "Maria needs to pick up her game"
@@ -82,7 +82,7 @@ Feature: Teacher can manage participants from the fast participants report
     And I navigate to "Reports" in current page administration
     And I click on "Fast participants" "link" in the "region-main" "region"
     And I click on "Search" "button" in the "#report-fastparticipants-filter" "css_element"
-    And I set the field "Select Maria Souza" to "1"
+    And I set the field "Select 'Maria Souza'" to "1"
     When I set the field "With selected users..." to "Edit selected user enrolments"
     And I set the field "Alter status" to "Suspended"
     And I press "Save changes"
