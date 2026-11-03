@@ -25,15 +25,22 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['accesssince_never'] = 'Never accessed the course';
+$string['anyenrolmethod'] = 'Any enrolment method';
+$string['anylastaccess'] = 'Any time';
+$string['anyrole'] = 'Any role';
+$string['anystatus'] = 'Any status';
+$string['enrolmentstatustext'] = '{$a->instance}: {$a->status}';
 $string['eventreportviewed'] = 'Fast participants report viewed';
 $string['fastparticipants:view'] = 'View fast participants report';
 $string['maxperpage'] = 'Maximum rows per page';
 $string['maxperpage_desc'] = 'Hard upper limit for the number of participants shown on a single page of the report.';
 $string['maxselectall'] = 'Maximum users for "select all"';
-$string['maxselectall_desc'] = 'Maximum number of matching users that can be selected at once with "Select all N users" ' .
-    'for bulk actions.';
+$string['maxselectall_desc'] = 'Maximum number of matching users that can be selected at once with "Select all N users" for bulk actions.';
+$string['notaccessedfor'] = 'Not accessed for {$a}';
 $string['pluginname'] = 'Fast participants';
 $string['privacy:metadata'] = 'The Fast participants report plugin does not store any personal data.';
 $string['replaceparticipants'] = 'Replace the Participants page';
-$string['replaceparticipants_desc'] = 'If enabled, the "Participants" item of the course navigation points to this report ' .
-    'instead of the standard participants page.';
+$string['replaceparticipants_desc'] = 'If enabled, the "Participants" item of the course navigation points to this report instead of the standard participants page.';
+$string['selectalltruncated'] = 'Only the first {$a->count} of {$a->total} matching users were selected (the limit is {$a->max}).';
+$string['selectedallcount'] = 'All {$a} matching users selected (clear selection)';
