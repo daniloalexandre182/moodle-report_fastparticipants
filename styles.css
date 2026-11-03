@@ -1,0 +1,12 @@
+/* The inline editable autocompletes (roles, groups) must not be clipped by the responsive table wrapper. */
+.path-report-fastparticipants #report-fastparticipants-bulkform .no-overflow {
+    overflow: visible;
+}
+
+.path-report-fastparticipants #report-fastparticipants-participants td {
+    vertical-align: middle;
+}
+
+.path-report-fastparticipants #report-fastparticipants-filter .fitem .custom-select {
+    max-width: 100%;
+}
