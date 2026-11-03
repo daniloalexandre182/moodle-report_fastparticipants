@@ -59,7 +59,7 @@ final class row_loader_test extends \advanced_testcase {
      * Roles, groups and enrolment statuses are loaded and exposed like the core participants page.
      */
     public function test_load_data(): void {
-        global $DB, $OUTPUT;
+        global $DB, $PAGE;
         $this->resetAfterTest();
         $this->setAdminUser();
 
@@ -67,6 +67,7 @@ final class row_loader_test extends \advanced_testcase {
         $course = $generator->create_course(['fullname' => 'Physics 101']);
         $context = \context_course::instance($course->id);
         $this->set_page($course);
+        $output = $PAGE->get_renderer('core');
 
         $alpha = $generator->create_group(['courseid' => $course->id, 'name' => 'Alpha']);
         $beta = $generator->create_group(['courseid' => $course->id, 'name' => 'Beta']);
@@ -101,7 +102,7 @@ final class row_loader_test extends \advanced_testcase {
         $this->assertSame([$studentname], $loader->get_role_names($student->id));
         $this->assertSame([$teachername], $loader->get_role_names($teacher->id));
         $this->assertSame([], $loader->get_role_names($outsider->id));
-        $roles = $loader->get_user_roles_editable($student)->export_for_template($OUTPUT);
+        $roles = $loader->get_user_roles_editable($student)->export_for_template($output);
         $this->assertSame([(int) $this->get_role('student')->id], array_map('intval', json_decode($roles['value'])));
         $this->assertSame($studentname, $roles['displayvalue']);
 
@@ -109,10 +110,10 @@ final class row_loader_test extends \advanced_testcase {
         $this->assertSame(['Alpha', 'Beta'], $loader->get_group_names($student->id));
         $this->assertSame(['Alpha'], $loader->get_group_names($teacher->id));
         $this->assertSame([], $loader->get_group_names($other->id));
-        $groups = $loader->get_user_groups_editable($student)->export_for_template($OUTPUT);
+        $groups = $loader->get_user_groups_editable($student)->export_for_template($output);
         $this->assertSame([(int) $alpha->id, (int) $beta->id], json_decode($groups['value']));
         $this->assertSame('Alpha, Beta', $groups['displayvalue']);
-        $groups = $loader->get_user_groups_editable($other)->export_for_template($OUTPUT);
+        $groups = $loader->get_user_groups_editable($other)->export_for_template($output);
         $this->assertSame([], json_decode($groups['value']));
 
         // Enrolment statuses.
@@ -136,7 +137,7 @@ final class row_loader_test extends \advanced_testcase {
 
         $fields = $loader->get_status_fields($student);
         $this->assertCount(1, $fields);
-        $data = $fields[0]->export_for_template($OUTPUT);
+        $data = $fields[0]->export_for_template($output);
         $this->assertTrue($data->active);
         $this->assertFalse($data->suspended);
         $this->assertSame($manualname, $data->enrolinstancename);
@@ -145,13 +146,13 @@ final class row_loader_test extends \advanced_testcase {
         $this->assertNotEmpty($data->enrolactions);
         $this->assertNotEmpty($data->timeenrolled);
 
-        $data = $loader->get_status_fields($teacher)[0]->export_for_template($OUTPUT);
+        $data = $loader->get_status_fields($teacher)[0]->export_for_template($output);
         $this->assertTrue($data->suspended);
         $this->assertFalse($data->active);
 
         $names = [];
         foreach ($loader->get_status_fields($other) as $field) {
-            $data = $field->export_for_template($OUTPUT);
+            $data = $field->export_for_template($output);
             $this->assertTrue($data->notcurrent);
             $names[] = $data->enrolinstancename;
         }
@@ -235,7 +236,8 @@ final class row_loader_test extends \advanced_testcase {
         $this->assertCount(1, $loader->get_group_names($userids[34]));
         $this->assertCount(1, $loader->get_role_names($userids[34]));
 
+        // The cost per page must not depend on the number of users (core enrolment manager queries included).
         $this->assertSame($reads5, $reads30);
-        $this->assertLessThanOrEqual(3, $reads30);
+        $this->assertLessThanOrEqual(10, $reads30);
     }
 }

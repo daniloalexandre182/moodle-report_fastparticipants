@@ -105,11 +105,11 @@ final class hook_callbacks_test extends \advanced_testcase {
      * @return array [urls, active url]
      */
     private function get_bar_urls(\stdClass $course): array {
-        global $PAGE, $OUTPUT;
+        global $PAGE;
         $PAGE->set_url('/report/fastparticipants/index.php', ['id' => $course->id, 'run' => 1, 'search' => 'x']);
         $PAGE->set_context(\context_course::instance($course->id));
         $bar = new output\participants_action_bar($course, $PAGE, null);
-        $data = $bar->export_for_template($OUTPUT);
+        $data = $bar->export_for_template($PAGE->get_renderer('core'));
         $this->assertNotEmpty($data['navigation']);
         $urls = [];
         foreach ($data['navigation']->options as $option) {
