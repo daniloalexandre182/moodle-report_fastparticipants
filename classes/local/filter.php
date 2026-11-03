@@ -69,6 +69,9 @@ final class filter {
     /** Default number of rows per page, used when the core setting is empty. */
     private const DEFAULT_PERPAGE = 20;
 
+    /** Default maximum number of users selected by "select all", used when the admin setting is unset. */
+    private const DEFAULT_MAXSELECTALL = 5000;
+
     /** Highest accepted "not accessed for N days" value (100 years). */
     private const MAX_ACCESSSINCE_DAYS = 36500;
 
@@ -586,6 +589,25 @@ final class filter {
     public static function get_max_perpage(): int {
         $max = (int) get_config('report_fastparticipants', 'maxperpage');
         return $max > 0 ? $max : self::DEFAULT_MAXPERPAGE;
+    }
+
+    /**
+     * Returns the effective maximum number of users that "select all" can select.
+     *
+     * It is the admin setting report_fastparticipants/maxselectall (5000 when unset, 0 disables "select all"),
+     * lowered so the submitted bulk form fits in PHP max_input_vars: the selected ids are posted as one input
+     * each, and a margin of 50 inputs is kept for sesskey, id, returnto, formaction and the other fixed fields.
+     *
+     * @return int
+     */
+    public static function get_max_selectall(): int {
+        $value = get_config('report_fastparticipants', 'maxselectall');
+        $max = ($value === false || $value === '') ? self::DEFAULT_MAXSELECTALL : max(0, (int) $value);
+        $maxinput = (int) ini_get('max_input_vars');
+        if ($maxinput > 0) {
+            $max = min($max, max(0, $maxinput - 50));
+        }
+        return $max;
     }
 
     /**

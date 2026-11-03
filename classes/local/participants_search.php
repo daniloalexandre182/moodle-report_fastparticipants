@@ -31,10 +31,12 @@ use core_user\fields;
  *
  * The query never uses DISTINCT nor derived tables. The only join is {user_lastaccess}, which is unique
  * per (userid, courseid), and every filter is a semijoin (u.id IN / NOT IN subquery), so each user appears
- * once no matter how many enrolments, roles or groups they have:
+ * once no matter how many enrolments, roles or groups they have. The join is added only when a query needs it
+ * (the last access filter is active, or the page is sorted by last access), because MySQL does not eliminate
+ * unused outer joins:
  *
  *     FROM {user} u
- *     LEFT JOIN {user_lastaccess} ul ON ul.userid = u.id AND ul.courseid = :course
+ *     [LEFT JOIN {user_lastaccess} ul ON ul.userid = u.id AND ul.courseid = :course]
  *     WHERE u.deleted = 0 AND u.id <> :guest
  *       AND u.id IN (SELECT ue.userid FROM {user_enrolments} ue JOIN {enrol} e ... [forced active])
  *       AND u.id IN (...filter...) ...
@@ -62,7 +64,7 @@ final class participants_search {
     /** @var int Counter used to generate unique parameter names. */
     private int $paramcounter = 0;
 
-    /** @var array|null Cached ['from' => string, 'where' => string, 'params' => array]. */
+    /** @var array|null Cached ['from' => string, 'where' => string, 'params' => array, 'join' => string, 'joinparams' => array]. */
     private ?array $basesql = null;
 
     /**
@@ -89,7 +91,9 @@ final class participants_search {
         if ($this->filter->is_notingroup()) {
             return 0;
         }
-        ['from' => $from, 'where' => $where, 'params' => $params] = $this->get_base_sql();
+        ['from' => $from, 'where' => $where, 'params' => $params] = $this->get_query_sql(
+            $this->filter->get_accesssince() !== 0
+        );
         return (int) $DB->count_records_sql("SELECT COUNT(1) FROM {$from} WHERE {$where}", $params);
     }
 
@@ -107,8 +111,8 @@ final class participants_search {
         if ($this->filter->is_notingroup() || $limit <= 0) {
             return [];
         }
-        ['from' => $from, 'where' => $where, 'params' => $params] = $this->get_base_sql();
         $orderby = $this->get_order_by($sortcolumns);
+        ['from' => $from, 'where' => $where, 'params' => $params] = $this->get_query_sql($this->needs_lastaccess_join($orderby));
         $rs = $DB->get_recordset_sql(
             "SELECT u.id FROM {$from} WHERE {$where} ORDER BY {$orderby}",
             $params,
@@ -178,11 +182,11 @@ final class participants_search {
     public function get_userids_recordset(array $sortcolumns): \moodle_recordset {
         global $DB;
 
-        ['from' => $from, 'where' => $where, 'params' => $params] = $this->get_base_sql();
+        $orderby = $this->get_order_by($sortcolumns);
+        ['from' => $from, 'where' => $where, 'params' => $params] = $this->get_query_sql($this->needs_lastaccess_join($orderby));
         if ($this->filter->is_notingroup()) {
             $where = '1 = 0';
         }
-        $orderby = $this->get_order_by($sortcolumns);
         return $DB->get_recordset_sql("SELECT u.id FROM {$from} WHERE {$where} ORDER BY {$orderby}", $params);
     }
 
@@ -220,9 +224,38 @@ final class participants_search {
     }
 
     /**
-     * Builds (once) the FROM, WHERE and params shared by every query.
+     * Whether a query ordered by the given ORDER BY clause needs the last access join.
      *
+     * @param string $orderby ORDER BY clause built by {@see self::get_order_by()}.
+     * @return bool True when the last access filter is active or the clause sorts by last access.
+     */
+    private function needs_lastaccess_join(string $orderby): bool {
+        return $this->filter->get_accesssince() !== 0 || str_contains($orderby, 'ul.');
+    }
+
+    /**
+     * Returns the FROM, WHERE and params of a query, with the last access join only when requested.
+     *
+     * The join parameter is added only together with the join.
+     *
+     * @param bool $withlastaccess Whether to join {user_lastaccess} as ul.
      * @return array ['from' => string, 'where' => string, 'params' => array]
+     */
+    private function get_query_sql(bool $withlastaccess): array {
+        $base = $this->get_base_sql();
+        $from = $base['from'];
+        $params = $base['params'];
+        if ($withlastaccess) {
+            $from .= $base['join'];
+            $params += $base['joinparams'];
+        }
+        return ['from' => $from, 'where' => $base['where'], 'params' => $params];
+    }
+
+    /**
+     * Builds (once) the FROM, last access JOIN, WHERE and params shared by every query.
+     *
+     * @return array ['from' => string, 'join' => string, 'joinparams' => array, 'where' => string, 'params' => array]
      */
     private function get_base_sql(): array {
         global $CFG;
@@ -232,9 +265,9 @@ final class participants_search {
         }
 
         $params = [];
-        $courseparam = $this->add_param($params, $this->course->id);
-        $from = "{user} u
-                 LEFT JOIN {user_lastaccess} ul ON ul.userid = u.id AND ul.courseid = :{$courseparam}";
+        $joinparams = [];
+        $joincourseparam = $this->add_param($joinparams, $this->course->id);
+        $join = "\n LEFT JOIN {user_lastaccess} ul ON ul.userid = u.id AND ul.courseid = :{$joincourseparam}";
 
         $guestparam = $this->add_param($params, (int) $CFG->siteguest);
         $courseparam = $this->add_param($params, $this->course->id);
@@ -268,7 +301,9 @@ final class participants_search {
         }
 
         $this->basesql = [
-            'from' => $from,
+            'from' => '{user} u',
+            'join' => $join,
+            'joinparams' => $joinparams,
             'where' => implode("\n AND ", $wheres),
             'params' => $params,
         ];

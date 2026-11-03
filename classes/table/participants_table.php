@@ -136,7 +136,6 @@ class participants_table extends \core_table\sql_table {
 
         $mastercheckbox = new \core\output\checkbox_toggleall(self::TOGGLE_GROUP, true, [
             'id' => 'report-fastparticipants-selectall-page',
-            'name' => 'report-fastparticipants-selectall-page',
             'label' => get_string('selectall'),
             'labelclasses' => 'sr-only',
             'classes' => 'm-1',
@@ -204,7 +203,10 @@ class participants_table extends \core_table\sql_table {
         $pagesize = max(1, (int) $this->get_page_size());
         $lastpage = $this->total > 0 ? intdiv($this->total - 1, $pagesize) : 0;
         if ($this->currpage > $lastpage) {
-            $this->set_page_number($lastpage);
+            $this->set_page_number($lastpage + 1); // The method is 1-based.
+        }
+        if ($this->currpage < 0) {
+            $this->set_page_number(1);
         }
 
         $userids = $this->search->get_page_userids(

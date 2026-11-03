@@ -188,7 +188,7 @@ echo html_writer::tag('p', get_string('countparticipantsfound', 'core_user', $to
 
 echo $tablehtml;
 
-$maxselectall = (int) get_config('report_fastparticipants', 'maxselectall') ?: 5000;
+$maxselectall = filter::get_max_selectall();
 if ($total > 0) {
     $bulkactions = new bulk_actions($course, $context, $total, $table->get_displayed_count(), $maxselectall);
     echo $OUTPUT->render_from_template('report_fastparticipants/bulk_actions', $bulkactions->export_for_template($OUTPUT));
@@ -213,9 +213,11 @@ if ($total > 0) {
         'filter' => $filter->to_url_params(),
         'maxselectall' => $maxselectall,
     ]]);
-    if (has_capability('moodle/course:enrolreview', $context)) {
-        $PAGE->requires->js_call_amd('report_fastparticipants/status_field', 'init', [['uniqueid' => $table->uniqueid]]);
-    }
+}
+
+// Outside the total check so a toast stored after unenrolling the last matching user is shown (and cleared) now.
+if (has_capability('moodle/course:enrolreview', $context)) {
+    $PAGE->requires->js_call_amd('report_fastparticipants/status_field', 'init', [['uniqueid' => $table->uniqueid]]);
 }
 
 echo html_writer::end_div();

@@ -114,6 +114,21 @@ final class get_matching_userids_test extends \advanced_testcase {
     }
 
     /**
+     * A cap of 0 disables "select all": no ids are returned and the result is truncated.
+     */
+    public function test_disabled_when_max_is_zero(): void {
+        $this->resetAfterTest();
+        [$course, $teacher] = $this->setup_course();
+        $this->setUser($teacher);
+        set_config('maxselectall', 0, 'report_fastparticipants');
+
+        $result = $this->call($course->id);
+        $this->assertSame([], $result['userids']);
+        $this->assertSame(4, $result['total']);
+        $this->assertTrue($result['truncated']);
+    }
+
+    /**
      * A student without the capability is rejected.
      */
     public function test_student_denied(): void {

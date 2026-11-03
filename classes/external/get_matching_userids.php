@@ -92,9 +92,13 @@ final class get_matching_userids extends external_api {
             return ['userids' => [], 'total' => 0, 'truncated' => false];
         }
 
-        $max = (int) get_config('report_fastparticipants', 'maxselectall') ?: 5000;
+        $max = filter::get_max_selectall();
         $search = new participants_search($course, $context, $f);
         $total = $search->count();
+        if ($max <= 0) {
+            // Select all is disabled.
+            return ['userids' => [], 'total' => $total, 'truncated' => $total > 0];
+        }
         $ids = $search->get_matching_userids($max);
 
         return ['userids' => $ids, 'total' => $total, 'truncated' => $total > count($ids)];

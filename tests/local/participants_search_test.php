@@ -449,6 +449,50 @@ final class participants_search_test extends \advanced_testcase {
     }
 
     /**
+     * Sorting by last access without the last access filter still works (the join is added only when needed).
+     */
+    public function test_sort_by_lastaccess_without_accesssince_filter(): void {
+        global $DB;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $old = $generator->create_user();
+        $recent = $generator->create_user();
+        $never = $generator->create_user();
+        foreach ([$old, $recent, $never] as $user) {
+            $generator->enrol_user($user->id, $course->id, 'student');
+        }
+        $DB->insert_record(
+            'user_lastaccess',
+            ['userid' => $old->id, 'courseid' => $course->id, 'timeaccess' => time() - 10 * DAYSECS]
+        );
+        $DB->insert_record(
+            'user_lastaccess',
+            ['userid' => $recent->id, 'courseid' => $course->id, 'timeaccess' => time() - HOURSECS]
+        );
+
+        $search = $this->make_search($course);
+        $this->assertSame(3, $search->count());
+        $this->assertSame(
+            [(int) $recent->id, (int) $old->id, (int) $never->id],
+            $search->get_page_userids(['lastaccess' => SORT_DESC], 0, 10)
+        );
+        $this->assertSame(
+            [(int) $never->id, (int) $old->id, (int) $recent->id],
+            $search->get_page_userids(['lastaccess' => SORT_ASC], 0, 10)
+        );
+        $rs = $search->get_userids_recordset(['lastaccess' => SORT_DESC]);
+        $ids = [];
+        foreach ($rs as $record) {
+            $ids[] = (int) $record->id;
+        }
+        $rs->close();
+        $this->assertSame([(int) $recent->id, (int) $old->id, (int) $never->id], $ids);
+    }
+
+    /**
      * Separate groups: a non-editing teacher only sees members of their groups; without a group, nobody.
      */
     public function test_separate_groups(): void {

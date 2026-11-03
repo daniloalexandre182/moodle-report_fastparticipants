@@ -380,4 +380,26 @@ final class filter_test extends \advanced_testcase {
         $this->assertFalse($filter->is_normalised());
         $this->assertSame(filter::STATUS_ANY, $normalised->get_status());
     }
+
+    /**
+     * The "select all" cap uses the setting, defaults to 5000 and is limited by max_input_vars.
+     */
+    public function test_get_max_selectall(): void {
+        $this->resetAfterTest();
+
+        $maxinput = (int) ini_get('max_input_vars');
+        $limit = static fn(int $max): int => $maxinput > 0 ? min($max, max(0, $maxinput - 50)) : $max;
+
+        unset_config('maxselectall', 'report_fastparticipants');
+        $this->assertSame($limit(5000), filter::get_max_selectall());
+
+        set_config('maxselectall', 0, 'report_fastparticipants');
+        $this->assertSame(0, filter::get_max_selectall());
+
+        set_config('maxselectall', 10, 'report_fastparticipants');
+        $this->assertSame($limit(10), filter::get_max_selectall());
+
+        set_config('maxselectall', -5, 'report_fastparticipants');
+        $this->assertSame(0, filter::get_max_selectall());
+    }
 }
