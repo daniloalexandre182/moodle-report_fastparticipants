@@ -69,9 +69,9 @@ Or download the ZIP and extract it to `report/fastparticipants`. Then visit
 
 ## Capabilities
 
-- `report/fastparticipants:view` – view the report (teacher, editing teacher and manager by default;
-  cloned from `moodle/course:viewparticipants`). Access also requires the standard right to view
-  participants in the course.
+- `report/fastparticipants:view` – view the report (non-editing teacher, teacher and manager by
+  default; students are not allowed). Access also requires the standard right to view participants
+  in the course.
 
 ## Privacy
 
@@ -141,7 +141,7 @@ Ou extraia o ZIP em `report/fastparticipants` e acesse *Administração do site 
 ### Capacidades
 
 - `report/fastparticipants:view` – ver o relatório (professor, professor editor e gerente por padrão;
-  clonada de `moodle/course:viewparticipants`).
+  estudantes não têm acesso). Também é exigida a permissão padrão de ver os participantes do curso.
 
 ### Privacidade
 

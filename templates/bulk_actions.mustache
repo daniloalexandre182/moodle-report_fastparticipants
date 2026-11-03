@@ -1,0 +1,96 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template report_fastparticipants/bulk_actions
+
+    Bulk actions bar of the fast participants report ("With selected users...").
+
+    Must be rendered inside the #report-fastparticipants-bulkform form. The ids and data attributes are used by
+    the report_fastparticipants/participants JS module.
+
+    Context variables required for this template:
+    * total - Total number of matching users.
+    * showselectall - Whether to show the "select all N matching users" button.
+    * hasoptions - Whether there is at least one bulk action.
+    * optgroups - Option groups, each with a label and options (value, label, optional endpoint).
+    * statehelpicon - Rendered help icon of the note state (HTML).
+
+    Example context (json):
+    {
+        "total": 150,
+        "showselectall": true,
+        "hasoptions": true,
+        "optgroups": [
+            {
+                "label": "Communication",
+                "options": [
+                    {"value": "#messageselect", "label": "Send a message"},
+                    {"value": "#addgroupnote", "label": "Add a new note"}
+                ]
+            },
+            {
+                "label": "Download table data as",
+                "options": [
+                    {
+                        "value": "bulkchange.php?operation=download_participants&dataformat=csv",
+                        "label": "Comma separated values (.csv)",
+                        "endpoint": "https://example.com/user/action_redir.php"
+                    }
+                ]
+            },
+            {
+                "label": "Manual enrolments",
+                "options": [
+                    {
+                        "value": "bulkchange.php?plugin=manual&operation=editselectedusers",
+                        "label": "Edit selected user enrolments",
+                        "endpoint": "https://example.com/report/fastparticipants/bulkchange.php"
+                    }
+                ]
+            }
+        ],
+        "statehelpicon": "<a class=\"btn btn-link p-0\" href=\"#\">?</a>"
+    }
+}}
+<div class="report-fastparticipants-bulkactions d-flex flex-wrap align-items-center mt-3">
+    {{#showselectall}}
+        <div class="mr-3 mb-2">
+            <button type="button" class="btn btn-secondary" id="report-fastparticipants-selectall"
+                    data-action="selectall" data-count="{{total}}">
+                {{#str}}selectallmatching, report_fastparticipants, {{total}}{{/str}}
+            </button>
+        </div>
+    {{/showselectall}}
+    {{#hasoptions}}
+        <div class="d-flex flex-wrap align-items-center mb-2">
+            <label for="formactionid" class="col-form-label d-inline mr-2">{{#str}}withselectedusers{{/str}}</label>
+            <select id="formactionid" name="formaction" class="custom-select"
+                    data-action="toggle" data-togglegroup="report-fastparticipants-table" data-toggle="action" disabled>
+                <option value="">{{#str}}choosedots{{/str}}</option>
+                {{#optgroups}}
+                    <optgroup label="{{label}}">
+                        {{#options}}
+                            <option value="{{value}}"{{#endpoint}} data-endpoint="{{endpoint}}"{{/endpoint}}>{{label}}</option>
+                        {{/options}}
+                    </optgroup>
+                {{/optgroups}}
+            </select>
+        </div>
+    {{/hasoptions}}
+    <div data-region="report_fastparticipants/selectedall" class="d-none"></div>
+    <div class="d-none" data-region="state-help-icon">{{{statehelpicon}}}</div>
+</div>

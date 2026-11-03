@@ -37,7 +37,7 @@ use core_privacy\manager;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \report_fastparticipants\privacy\provider
  */
-class provider_test extends \core_privacy\tests\provider_testcase {
+final class provider_test extends \core_privacy\tests\provider_testcase {
     /**
      * The provider must be a null provider whose reason is an existing language string.
      */
