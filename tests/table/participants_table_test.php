@@ -106,8 +106,8 @@ final class participants_table_test extends \advanced_testcase {
     }
 
     /**
-     * The rendered table matches what the AMD module and core 5.2 expect: Bootstrap 5 hidden label, row checkboxes
-     * as core/checkbox-toggleall "target" elements and the "Suspended" badge of suspended accounts.
+     * The rendered table matches what the AMD module and core 5.1 expect: Bootstrap 5 hidden label and row checkboxes
+     * as core/checkbox-toggleall "target" elements.
      */
     public function test_render_markup(): void {
         global $PAGE;
@@ -115,12 +115,8 @@ final class participants_table_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
         $course = $this->getDataGenerator()->create_course();
-        $this->getDataGenerator()->create_and_enrol($course, 'student', ['firstname' => 'Active', 'lastname' => 'Student']);
-        $this->getDataGenerator()->create_and_enrol($course, 'student', [
-            'firstname' => 'Suspended',
-            'lastname' => 'Account',
-            'suspended' => 1,
-        ]);
+        $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $this->getDataGenerator()->create_and_enrol($course, 'student');
         $context = \context_course::instance($course->id);
         $baseurl = new \moodle_url('/report/fastparticipants/index.php', ['id' => $course->id, 'run' => 1]);
         $PAGE->set_url($baseurl);
@@ -136,6 +132,5 @@ final class participants_table_test extends \advanced_testcase {
         $this->assertStringNotContainsString('data-toggle="slave"', $html);
         $this->assertStringContainsString('visually-hidden', $html);
         $this->assertStringNotContainsString('sr-only', $html);
-        $this->assertSame(1, substr_count($html, get_string('suspended', 'auth')));
     }
 }

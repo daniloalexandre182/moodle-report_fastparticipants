@@ -313,7 +313,6 @@ class participants_table extends \core_table\sql_table {
         return $OUTPUT->render(\core_user::get_profile_picture($data, $this->context, [
             'courseid' => $this->course->id,
             'includefullname' => true,
-            'showsuspended' => true,
         ]));
     }
 
