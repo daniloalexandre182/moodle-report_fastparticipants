@@ -2,6 +2,15 @@
 
 All notable changes to `report_fastparticipants` are documented in this file.
 
+## [1.2.0] - 2026-11-04 (version 2026110401)
+
+### Changed
+- Moodle 5.3 support (branch `MOODLE_503_STABLE`, requires 5.3, PHP 8.3 – 8.4). The 5.2 version stays on
+  `MOODLE_502_STABLE` and the 5.1 version on `MOODLE_501_STABLE`.
+- Enrolment status details tell why an enrolment is not current (not yet started, expired or enrolment method
+  disabled), as the Moodle 5.3 participants page.
+- GitHub Actions matrix moved to `MOODLE_503_STABLE` (PHP 8.3/PostgreSQL 17 and PHP 8.4/MariaDB 11.4).
+
 ## [1.1.0] - 2026-11-04 (version 2026110400)
 
 ### Changed

@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026110400;                // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2026042000;               // Requires this Moodle version (5.2).
+$plugin->version   = 2026110401;                // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2026100500;               // Requires this Moodle version (5.3).
 $plugin->component = 'report_fastparticipants'; // Full name of the plugin (used for diagnostics).
-$plugin->supported = [502, 502];               // Supported Moodle versions (branch numbers).
+$plugin->supported = [503, 503];               // Supported Moodle versions (branch numbers).
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.1.0';
+$plugin->release   = '1.2.0';

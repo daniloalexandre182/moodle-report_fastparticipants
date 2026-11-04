@@ -106,7 +106,7 @@ final class participants_table_test extends \advanced_testcase {
     }
 
     /**
-     * The rendered table matches what the AMD module and core 5.2 expect: Bootstrap 5 hidden label, row checkboxes
+     * The rendered table matches what the AMD module and core 5.3 expect: Bootstrap 5 hidden label, row checkboxes
      * as core/checkbox-toggleall "target" elements and the "Suspended" badge of suspended accounts.
      */
     public function test_render_markup(): void {

@@ -225,7 +225,7 @@ final class row_loader {
         $fullname = htmlspecialchars(fullname($user, $this->canviewfullnames), ENT_QUOTES, 'utf-8');
         $fields = [];
         foreach ($this->userenrolments[$user->id] as $ue) {
-            [$status, $statusval] = $this->get_enrolment_status($ue);
+            [$status, $statusval, $statusinfo] = $this->get_enrolment_status($ue);
             $actions = $ue->enrolmentplugin->get_user_enrolment_actions($manager, $ue);
             $statusfield = new status_field(
                 $ue->enrolmentinstancename,
@@ -235,7 +235,8 @@ final class row_loader {
                 $ue->timestart,
                 $ue->timeend,
                 $actions,
-                $ue->timecreated
+                $ue->timecreated,
+                $statusinfo
             );
             $fields[] = $statusfield->set_status($statusval);
         }
@@ -352,23 +353,33 @@ final class row_loader {
     }
 
     /**
-     * Returns the status label and status_field constant of a user enrolment (as core participants::col_status()).
+     * Returns the status label, status_field constant and status details of a user enrolment
+     * (as core participants::col_status() in Moodle 5.3).
      *
-     * @param \stdClass $ue User enrolment with enrolmentinstance.
-     * @return array [string label, int status_field::STATUS_*]
+     * @param \stdClass $ue User enrolment with enrolmentinstance and enrolmentinstancename.
+     * @return array [string label, int status_field::STATUS_*, string details ('' when there are none)]
      */
     private function get_enrolment_status(\stdClass $ue): array {
         $status = get_string('participationactive', 'enrol');
         $statusval = status_field::STATUS_ACTIVE;
+        $statusinfo = '';
         switch ($ue->status) {
             case ENROL_USER_ACTIVE:
                 $now = time();
-                $isexpired = $ue->timestart > $now || ($ue->timeend > 0 && $ue->timeend < $now);
+                $notyetstarted = $ue->timestart > $now;
+                $isexpired = $ue->timeend > 0 && $ue->timeend < $now;
                 $enrolmentdisabled = $ue->enrolmentinstance->status == ENROL_INSTANCE_DISABLED;
                 // If user enrolment status has not yet started/already ended or the enrolment instance is disabled.
-                if ($isexpired || $enrolmentdisabled) {
+                if ($notyetstarted || $isexpired || $enrolmentdisabled) {
                     $status = get_string('participationnotcurrent', 'enrol');
                     $statusval = status_field::STATUS_NOT_CURRENT;
+                    if ($enrolmentdisabled) {
+                        $statusinfo = get_string('plugindisabled', 'enrol', $ue->enrolmentinstancename);
+                    } else if ($notyetstarted) {
+                        $statusinfo = get_string('futureenrolment', 'enrol');
+                    } else {
+                        $statusinfo = get_string('enrolmentexpired', 'enrol');
+                    }
                 }
                 break;
             case ENROL_USER_SUSPENDED:
@@ -376,7 +387,7 @@ final class row_loader {
                 $statusval = status_field::STATUS_SUSPENDED;
                 break;
         }
-        return [$status, $statusval];
+        return [$status, $statusval, $statusinfo];
     }
 
     /**

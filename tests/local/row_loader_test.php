@@ -240,4 +240,56 @@ final class row_loader_test extends \advanced_testcase {
         $this->assertSame($reads5, $reads30);
         $this->assertLessThanOrEqual(10, $reads30);
     }
+
+    /**
+     * As in core 5.3, enrolments that are not current explain why: not yet started, expired or disabled method.
+     */
+    public function test_status_info(): void {
+        global $DB, $PAGE;
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course();
+        $context = \context_course::instance($course->id);
+        $this->set_page($course);
+        $output = $PAGE->get_renderer('core');
+
+        $self = $DB->get_record('enrol', ['courseid' => $course->id, 'enrol' => 'self']);
+        if (!$self) {
+            $selfid = enrol_get_plugin('self')->add_instance($course);
+            $self = $DB->get_record('enrol', ['id' => $selfid], '*', MUST_EXIST);
+        }
+        $DB->set_field('enrol', 'status', ENROL_INSTANCE_DISABLED, ['id' => $self->id]);
+        $self->status = ENROL_INSTANCE_DISABLED;
+
+        $active = $generator->create_user();
+        $future = $generator->create_user();
+        $expired = $generator->create_user();
+        $disabled = $generator->create_user();
+        $generator->enrol_user($active->id, $course->id, 'student', 'manual', time() - DAYSECS);
+        $generator->enrol_user($future->id, $course->id, 'student', 'manual', time() + DAYSECS);
+        $generator->enrol_user($expired->id, $course->id, 'student', 'manual', time() - WEEKSECS, time() - DAYSECS);
+        enrol_get_plugin('self')->enrol_user($self, $disabled->id, $this->get_role('student')->id, time() - DAYSECS);
+
+        $loader = new row_loader($course, $context);
+        $loader->load([$active->id, $future->id, $expired->id, $disabled->id]);
+
+        $data = $loader->get_status_fields($active)[0]->export_for_template($output);
+        $this->assertTrue($data->active);
+        $this->assertNull($data->statusinfo);
+
+        $data = $loader->get_status_fields($future)[0]->export_for_template($output);
+        $this->assertTrue($data->notcurrent);
+        $this->assertSame(get_string('futureenrolment', 'enrol'), $data->statusinfo);
+
+        $data = $loader->get_status_fields($expired)[0]->export_for_template($output);
+        $this->assertTrue($data->notcurrent);
+        $this->assertSame(get_string('enrolmentexpired', 'enrol'), $data->statusinfo);
+
+        $data = $loader->get_status_fields($disabled)[0]->export_for_template($output);
+        $this->assertTrue($data->notcurrent);
+        $selfname = enrol_get_plugin('self')->get_instance_name($self);
+        $this->assertSame(get_string('plugindisabled', 'enrol', $selfname), $data->statusinfo);
+    }
 }

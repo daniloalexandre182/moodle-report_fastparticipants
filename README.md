@@ -22,7 +22,9 @@ interaction. This plugin avoids that:
 
 ## Requirements
 
+- Moodle 5.3 (branch `MOODLE_503_STABLE`), PHP 8.3 – 8.4.
 - Moodle 5.2 (branch `MOODLE_502_STABLE`), PHP 8.3 – 8.4.
+- Moodle 5.1 (branch `MOODLE_501_STABLE`), PHP 8.2 – 8.4.
 - Moodle 4.5 (branch `MOODLE_405_STABLE`), PHP 8.1 – 8.3.
 
 ## Branches
@@ -30,7 +32,9 @@ interaction. This plugin avoids that:
 | Moodle version | Branch              |
 |----------------|---------------------|
 | 4.5            | `MOODLE_405_STABLE` |
+| 5.1            | `MOODLE_501_STABLE` |
 | 5.2            | `MOODLE_502_STABLE` |
+| 5.3            | `MOODLE_503_STABLE` |
 | Development    | `main`              |
 
 ## Installation
@@ -38,13 +42,13 @@ interaction. This plugin avoids that:
 Using git, from the Moodle root:
 
 ```bash
-# Moodle 5.2 (plugins live under public/)
-git clone -b MOODLE_502_STABLE https://github.com/daniloalexandre182/moodle-report_fastparticipants.git public/report/fastparticipants
+# Moodle 5.1, 5.2 or 5.3 (plugins live under public/): MOODLE_501_STABLE, MOODLE_502_STABLE or MOODLE_503_STABLE
+git clone -b MOODLE_503_STABLE https://github.com/daniloalexandre182/moodle-report_fastparticipants.git public/report/fastparticipants
 # Moodle 4.5
 git clone -b MOODLE_405_STABLE https://github.com/daniloalexandre182/moodle-report_fastparticipants.git report/fastparticipants
 ```
 
-Or download the ZIP and extract it to `public/report/fastparticipants` (5.2) or `report/fastparticipants` (4.5). Then visit
+Or download the ZIP and extract it to `public/report/fastparticipants` (5.1 or later) or `report/fastparticipants` (4.5). Then visit
 *Site administration → Notifications* to complete the installation.
 
 ## Usage
@@ -108,7 +112,9 @@ interação. Este plugin evita isso:
 
 ### Requisitos
 
+- Moodle 5.3 (branch `MOODLE_503_STABLE`), PHP 8.3 – 8.4.
 - Moodle 5.2 (branch `MOODLE_502_STABLE`), PHP 8.3 – 8.4.
+- Moodle 5.1 (branch `MOODLE_501_STABLE`), PHP 8.2 – 8.4.
 - Moodle 4.5 (branch `MOODLE_405_STABLE`), PHP 8.1 – 8.3.
 
 ### Instalação
@@ -116,13 +122,13 @@ interação. Este plugin evita isso:
 A partir da raiz do Moodle:
 
 ```bash
-# Moodle 5.2 (plugins live under public/)
-git clone -b MOODLE_502_STABLE https://github.com/daniloalexandre182/moodle-report_fastparticipants.git public/report/fastparticipants
+# Moodle 5.1, 5.2 or 5.3 (plugins live under public/): MOODLE_501_STABLE, MOODLE_502_STABLE or MOODLE_503_STABLE
+git clone -b MOODLE_503_STABLE https://github.com/daniloalexandre182/moodle-report_fastparticipants.git public/report/fastparticipants
 # Moodle 4.5
 git clone -b MOODLE_405_STABLE https://github.com/daniloalexandre182/moodle-report_fastparticipants.git report/fastparticipants
 ```
 
-Ou extraia o ZIP em `public/report/fastparticipants` (5.2) ou `report/fastparticipants` (4.5) e acesse *Administração do site → Notificações*.
+Ou extraia o ZIP em `public/report/fastparticipants` (5.1 ou superior) ou `report/fastparticipants` (4.5) e acesse *Administração do site → Notificações*.
 
 ### Uso
 
