@@ -42,8 +42,8 @@ const TOGGLE_GROUP = 'report-fastparticipants-table';
 const Selectors = {
     form: '#report-fastparticipants-bulkform',
     bulkActionSelect: '#formactionid',
-    userCheckboxes: `input[data-togglegroup="${TOGGLE_GROUP}"][data-toggle="slave"]`,
-    checkedUserCheckboxes: `input[data-togglegroup="${TOGGLE_GROUP}"][data-toggle="slave"]:checked`,
+    userCheckboxes: `input[data-togglegroup="${TOGGLE_GROUP}"][data-toggle="target"]`,
+    checkedUserCheckboxes: `input[data-togglegroup="${TOGGLE_GROUP}"][data-toggle="target"]:checked`,
     selectAllButton: '#report-fastparticipants-selectall',
     selectedAllRegion: '[data-region="report_fastparticipants/selectedall"]',
     stateHelpIcon: '[data-region="state-help-icon"]',
@@ -342,7 +342,7 @@ export const init = ({
             if (updatingCheckboxes || !selectedAllIds.length || data.toggleGroupName !== TOGGLE_GROUP) {
                 return;
             }
-            if (data.checkedSlaves.length !== data.slaves.length) {
+            if (data.checkedTargets.length !== data.targets.length) {
                 clearSelectAll(false);
             }
         });

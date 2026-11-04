@@ -68,7 +68,7 @@
 }}
 <div class="report-fastparticipants-bulkactions d-flex flex-wrap align-items-center mt-3">
     {{#showselectall}}
-        <div class="mr-3 mb-2">
+        <div class="me-3 mb-2">
             <button type="button" class="btn btn-secondary" id="report-fastparticipants-selectall"
                     data-action="selectall" data-count="{{total}}">
                 {{#str}}selectallmatching, report_fastparticipants, {{total}}{{/str}}
@@ -77,8 +77,8 @@
     {{/showselectall}}
     {{#hasoptions}}
         <div class="d-flex flex-wrap align-items-center mb-2">
-            <label for="formactionid" class="col-form-label d-inline mr-2">{{#str}}withselectedusers{{/str}}</label>
-            <select id="formactionid" name="formaction" class="custom-select"
+            <label for="formactionid" class="col-form-label d-inline me-2">{{#str}}withselectedusers{{/str}}</label>
+            <select id="formactionid" name="formaction" class="form-select w-auto"
                     data-action="toggle" data-togglegroup="report-fastparticipants-table" data-toggle="action" disabled>
                 <option value="">{{#str}}choosedots{{/str}}</option>
                 {{#optgroups}}

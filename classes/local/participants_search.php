@@ -149,7 +149,7 @@ final class participants_search {
         $ctxparam = $this->next_param_name();
         $ctxfields = \context_helper::get_preload_record_columns_sql('ctx');
 
-        $sql = "SELECT {$userfields->selects}, COALESCE(ul.timeaccess, 0) AS lastaccess, {$ctxfields}
+        $sql = "SELECT {$userfields->selects}, u.suspended, COALESCE(ul.timeaccess, 0) AS lastaccess, {$ctxfields}
                   FROM {user} u
              LEFT JOIN {user_lastaccess} ul ON ul.userid = u.id AND ul.courseid = :{$courseparam}
              LEFT JOIN {context} ctx ON ctx.instanceid = u.id AND ctx.contextlevel = :{$ctxparam}

@@ -2,6 +2,18 @@
 
 All notable changes to `report_fastparticipants` are documented in this file.
 
+## [1.1.0] - 2026-11-04 (version 2026110400)
+
+### Changed
+- Moodle 5.2 support (branch `MOODLE_502_STABLE`, requires 5.2, PHP 8.3 – 8.4). The 4.5 version stays on
+  `MOODLE_405_STABLE`.
+- Row checkboxes are looked up with `data-toggle="target"` and the `checkboxToggled` event is read through
+  `targets`/`checkedTargets`, as in `core/checkbox-toggleall` since Moodle 5.0. With the old `slave` names no
+  user was ever selected and unchecking a row after "Select all" raised a JavaScript error.
+- Bootstrap 5 classes: `visually-hidden`, `me-*` and `form-select` instead of `sr-only`, `mr-*` and `custom-select`.
+- The full name column shows the "Suspended" badge of suspended accounts, as the core participants page does in 5.x.
+- GitHub Actions matrix moved to `MOODLE_502_STABLE` (PHP 8.3/PostgreSQL 16 and PHP 8.4/MariaDB).
+
 ## [1.0.0] - 2026-11-03 (version 2026110301)
 
 ### Added

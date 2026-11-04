@@ -104,4 +104,38 @@ final class participants_table_test extends \advanced_testcase {
         $this->assertSame(2, $table->get_page_start());
         $this->assertSame(2, $table->get_displayed_count());
     }
+
+    /**
+     * The rendered table matches what the AMD module and core 5.2 expect: Bootstrap 5 hidden label, row checkboxes
+     * as core/checkbox-toggleall "target" elements and the "Suspended" badge of suspended accounts.
+     */
+    public function test_render_markup(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->create_and_enrol($course, 'student', ['firstname' => 'Active', 'lastname' => 'Student']);
+        $this->getDataGenerator()->create_and_enrol($course, 'student', [
+            'firstname' => 'Suspended',
+            'lastname' => 'Account',
+            'suspended' => 1,
+        ]);
+        $context = \context_course::instance($course->id);
+        $baseurl = new \moodle_url('/report/fastparticipants/index.php', ['id' => $course->id, 'run' => 1]);
+        $PAGE->set_url($baseurl);
+
+        $filter = filter::from_array(['run' => 1])->normalise($course, $context);
+        $search = new participants_search($course, $context, $filter);
+        $table = new participants_table($course, $context, $filter, $search, new row_loader($course, $context), $baseurl);
+        $html = $table->render($filter->get_perpage());
+
+        $this->assertSame(2, $table->get_total());
+        $this->assertStringContainsString('data-toggle="toggler"', $html);
+        $this->assertSame(2, substr_count($html, 'data-toggle="target"'));
+        $this->assertStringNotContainsString('data-toggle="slave"', $html);
+        $this->assertStringContainsString('visually-hidden', $html);
+        $this->assertStringNotContainsString('sr-only', $html);
+        $this->assertSame(1, substr_count($html, get_string('suspended', 'auth')));
+    }
 }

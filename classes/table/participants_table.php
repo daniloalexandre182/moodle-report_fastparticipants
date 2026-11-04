@@ -137,7 +137,7 @@ class participants_table extends \core_table\sql_table {
         $mastercheckbox = new \core\output\checkbox_toggleall(self::TOGGLE_GROUP, true, [
             'id' => 'report-fastparticipants-selectall-page',
             'label' => get_string('selectall'),
-            'labelclasses' => 'sr-only',
+            'labelclasses' => 'visually-hidden',
             'classes' => 'm-1',
             'checked' => false,
         ]);
@@ -313,6 +313,7 @@ class participants_table extends \core_table\sql_table {
         return $OUTPUT->render(\core_user::get_profile_picture($data, $this->context, [
             'courseid' => $this->course->id,
             'includefullname' => true,
+            'showsuspended' => true,
         ]));
     }
 
