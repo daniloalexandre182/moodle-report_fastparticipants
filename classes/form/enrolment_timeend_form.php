@@ -23,16 +23,20 @@ use moodle_url;
 /**
  * Modal form that edits only the end date ("Enrolment ends") of one user enrolment.
  *
- * The access rules are the ones of the core "Edit enrolment" action: the enrolment plugin must allow managing
- * user enrolments and the user needs enrol/<plugin>:manage, besides moodle/course:enrolreview and the report
- * capability. The change is saved through enrol_plugin::update_user_enrol(), so the user_enrolment_updated
- * event is triggered as in core.
+ * Any user who can use the report (report/fastparticipants:view) and review enrolments (moodle/course:enrolreview,
+ * required by the column) can edit the end date of any enrolment method, including methods that core does not
+ * let edit, such as cohort sync, except the methods that copy the dates from elsewhere ({@see self::READONLY_METHODS}).
+ * The change is saved through enrol_plugin::update_user_enrol(), so the user_enrolment_updated event is triggered
+ * as in core.
  *
  * @package    report_fastparticipants
  * @copyright  2026 Danilo Machado <danilo.alexandre182@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class enrolment_timeend_form extends dynamic_form {
+    /** @var string[] Enrolment methods whose dates are overwritten by their sync (meta link copies the parent course dates). */
+    public const READONLY_METHODS = ['meta'];
+
     /** @var \stdClass|null The user enrolment being edited. */
     private ?\stdClass $ue = null;
 
@@ -60,7 +64,10 @@ class enrolment_timeend_form extends dynamic_form {
     }
 
     /**
-     * Whether the current user can edit the end date of enrolments of the given instance (as core "Edit enrolment").
+     * Whether the current user can edit the end date of enrolments of the given instance.
+     *
+     * Unlike core, the enrolment method does not need to allow managing user enrolments (allow_manage()) nor the
+     * enrol/<plugin>:manage capability, so the end date of e.g. cohort enrolments can be edited too.
      *
      * @param \stdClass $instance Enrolment instance.
      * @param \enrol_plugin|null $plugin Its enrolment plugin.
@@ -68,13 +75,10 @@ class enrolment_timeend_form extends dynamic_form {
      * @return bool
      */
     public static function can_edit(\stdClass $instance, ?\enrol_plugin $plugin, \context $context): bool {
-        if (!$plugin || !$plugin->allow_manage($instance)) {
+        if (!$plugin || in_array($instance->enrol, self::READONLY_METHODS, true)) {
             return false;
         }
-        $capability = "enrol/{$instance->enrol}:manage";
-        return get_capability_info($capability)
-            && has_capability($capability, $context)
-            && has_capability('moodle/course:enrolreview', $context)
+        return has_capability('moodle/course:enrolreview', $context)
             && has_capability('report/fastparticipants:view', $context);
     }
 
@@ -99,7 +103,7 @@ class enrolment_timeend_form extends dynamic_form {
         require_capability('report/fastparticipants:view', $context);
         require_capability('moodle/course:enrolreview', $context);
         if (!self::can_edit($this->instance, $this->plugin, $context)) {
-            throw new \required_capability_exception($context, "enrol/{$this->instance->enrol}:manage", 'nopermissions', '');
+            throw new \moodle_exception('nopermissions', 'error', '', get_string('enroltimeend', 'enrol'));
         }
     }
 

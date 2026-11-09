@@ -249,7 +249,7 @@ final class row_loader {
     /**
      * Returns the end date data of each enrolment of a loaded user, for the "Enrolment ends" column.
      *
-     * Empty without moodle/course:enrolreview. The canedit flag follows the core "Edit enrolment" action rules.
+     * Empty without moodle/course:enrolreview. The canedit flag follows enrolment_timeend_form::can_edit().
      *
      * @param int $userid User id.
      * @return array[] List of ['ueid' => int, 'instancename' => string, 'timeend' => int, 'canedit' => bool]

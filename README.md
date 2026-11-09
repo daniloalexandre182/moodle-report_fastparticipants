@@ -55,8 +55,11 @@ Or download the ZIP and extract it to `report/fastparticipants`. Then visit
   course access.
 - Bulk actions on selected users, including "select all N matching users".
 - Inline role and group editing.
-- "Enrolment ends" column: shows the end date of each enrolment and edits it in a modal (same permissions
-  as the core "Edit enrolment" action: the enrolment method must allow it and `enrol/<method>:manage`).
+- "Enrolment ends" column: shows the end date of each enrolment and edits it in a modal. Anyone who can use
+  the report and review enrolments (`moodle/course:enrolreview`) can edit it, for any enrolment method,
+  including cohort sync (which core does not allow). Course meta link enrolments are read only, because
+  their dates are copied from the parent course. Note: if a user leaves and rejoins a cohort, the cohort
+  sync recreates or resets the enrolment without end date.
 - Export of the whole filtered list to CSV or Excel.
 - Bookmarkable URLs.
 
@@ -129,9 +132,11 @@ Ou extraia o ZIP em `report/fastparticipants` e acesse *Administração do site 
   grupo"), situação da inscrição, método de inscrição e último acesso ao curso.
 - Ações em lote, inclusive "selecionar todos os N usuários encontrados".
 - Edição de papéis e grupos na própria lista.
-- Coluna "Inscrição termina": mostra a data de término de cada inscrição e permite editá-la em um modal
-  (mesmas permissões da ação "Editar inscrição" do core: o método de inscrição precisa permitir e
-  `enrol/<método>:manage`).
+- Coluna "Inscrição termina": mostra a data de término de cada inscrição e permite editá-la em um modal.
+  Quem acessa o relatório e pode revisar inscrições (`moodle/course:enrolreview`) edita a data de qualquer
+  método, inclusive coorte (o core não permite). Inscrições por meta-curso ficam somente leitura, pois as
+  datas vêm do curso pai. Atenção: se o usuário sair e voltar ao coorte, a sincronização recria ou zera a
+  inscrição sem data de término.
 - Exportação da lista filtrada completa para CSV ou Excel.
 
 ### Configurações
