@@ -139,6 +139,7 @@ final class exporter {
         }
         if ($this->showstatus) {
             $columns['status'] = get_string('participationstatus', 'enrol');
+            $columns['timeend'] = get_string('enroltimeend', 'enrol');
         }
         return $columns;
     }
@@ -241,6 +242,7 @@ final class exporter {
         }
         if ($this->showstatus) {
             $row['status'] = self::implode_plain($this->loader->get_status_texts((int) $user->id));
+            $row['timeend'] = self::implode_plain($this->loader->get_timeend_texts((int) $user->id));
         }
         return $row;
     }

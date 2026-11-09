@@ -172,6 +172,8 @@ class participants_table extends \core_table\sql_table {
         if (has_capability('moodle/course:enrolreview', $this->context)) {
             $columns[] = 'status';
             $headers[] = get_string('participationstatus', 'enrol');
+            $columns[] = 'timeend';
+            $headers[] = get_string('enroltimeend', 'enrol');
         }
 
         $this->define_columns($columns);
@@ -367,6 +369,54 @@ class participants_table extends \core_table\sql_table {
         $output = '';
         foreach ($this->loader->get_status_fields($data) as $statusfield) {
             $output .= $OUTPUT->render_from_template('core_user/status_field', $statusfield->export_for_template($OUTPUT));
+        }
+        return $output;
+    }
+
+    /**
+     * Generates the "Enrolment ends" column: one end date per enrolment, with an edit link when allowed.
+     *
+     * The link opens the report_fastparticipants\form\enrolment_timeend_form modal (amd timeend_field).
+     *
+     * @param \stdClass $data The user.
+     * @return string
+     */
+    public function col_timeend($data) {
+        global $OUTPUT;
+
+        $items = $this->loader->get_timeend_items((int) $data->id);
+        if (empty($items)) {
+            return '';
+        }
+        $fullname = fullname($data, $this->canviewfullnames);
+        $showinstance = count($items) > 1;
+        $format = get_string('strftimedatetimeshort', 'langconfig');
+
+        $output = '';
+        foreach ($items as $item) {
+            $content = $item['timeend']
+                ? html_writer::span(userdate($item['timeend'], $format))
+                : html_writer::span(get_string('noenrolmentend', 'report_fastparticipants'), 'text-muted');
+            if ($showinstance) {
+                $content .= ' ' . html_writer::tag('small', '(' . s($item['instancename']) . ')', ['class' => 'text-muted']);
+            }
+            if ($item['canedit']) {
+                $label = get_string('edittimeendfor', 'report_fastparticipants', (object) [
+                    'fullname' => $fullname,
+                    'instance' => $item['instancename'],
+                ]);
+                $content .= html_writer::link('#', $OUTPUT->pix_icon('t/edit', $label), [
+                    'class' => 'ml-1',
+                    'role' => 'button',
+                    'data-action' => 'report_fastparticipants/edittimeend',
+                    'data-ueid' => $item['ueid'],
+                    // Escaped as in the core status field: the name is used in HTML strings by the JS.
+                    'data-fullname' => s($fullname),
+                ]);
+            }
+            $output .= html_writer::div($content, 'report-fastparticipants-timeend text-nowrap', [
+                'data-region' => 'report_fastparticipants/timeend',
+            ]);
         }
         return $output;
     }

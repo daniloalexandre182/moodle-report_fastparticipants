@@ -2,6 +2,15 @@
 
 All notable changes to `report_fastparticipants` are documented in this file.
 
+## [1.1.0] - 2026-11-09 (version 2026110900)
+
+### Added
+- "Enrolment ends" column (with `moodle/course:enrolreview`): end date of each user enrolment, with an edit link that
+  opens a modal form (`enrolment_timeend_form`, a `core_form\dynamic_form`) to change or remove only that date.
+  Allowed with the same rules as the core "Edit enrolment" action (`enrol_plugin::allow_manage()` and
+  `enrol/<plugin>:manage`); saved through `enrol_plugin::update_user_enrol()`, so the core event is triggered.
+- "Enrolment ends" column in the export.
+
 ## [1.0.0] - 2026-11-03 (version 2026110301)
 
 ### Added

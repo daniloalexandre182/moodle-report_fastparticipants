@@ -98,7 +98,7 @@ const showStoredToast = () => {
  * @param {Promise<String>} messagePromise
  * @returns {Promise}
  */
-const reloadWithToast = messagePromise => messagePromise
+export const reloadWithToast = messagePromise => messagePromise
     .catch(() => null)
     .then(message => {
         if (message) {
