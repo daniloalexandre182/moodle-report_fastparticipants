@@ -25,6 +25,7 @@
 namespace report_fastparticipants\local;
 
 use core_user\output\status_field;
+use report_fastparticipants\form\enrolment_timeend_form;
 
 /**
  * Batch loader of the per-row data (roles, groups, enrolments) of the fast participants report.
@@ -93,6 +94,9 @@ final class row_loader {
 
     /** @var array Loaded user enrolments, userid => [ueid => ue]. */
     private array $userenrolments = [];
+
+    /** @var array Whether the end date of the enrolments of an instance can be edited, instanceid => bool. */
+    private array $caneditinstance = [];
 
     /**
      * Constructor.
@@ -240,6 +244,58 @@ final class row_loader {
             $fields[] = $statusfield->set_status($statusval);
         }
         return $fields;
+    }
+
+    /**
+     * Returns the end date data of each enrolment of a loaded user, for the "Enrolment ends" column.
+     *
+     * Empty without moodle/course:enrolreview. The canedit flag follows enrolment_timeend_form::can_edit().
+     *
+     * @param int $userid User id.
+     * @return array[] List of ['ueid' => int, 'instancename' => string, 'timeend' => int, 'canedit' => bool]
+     */
+    public function get_timeend_items(int $userid): array {
+        $this->prepare();
+        if (!$this->canreviewenrol) {
+            return [];
+        }
+        $items = [];
+        foreach ($this->userenrolments[$userid] ?? [] as $ue) {
+            $instanceid = (int) $ue->enrolid;
+            if (!array_key_exists($instanceid, $this->caneditinstance)) {
+                $this->caneditinstance[$instanceid] = enrolment_timeend_form::can_edit(
+                    $ue->enrolmentinstance,
+                    $ue->enrolmentplugin ?: null,
+                    $this->context
+                );
+            }
+            $items[] = [
+                'ueid' => (int) $ue->id,
+                'instancename' => (string) $ue->enrolmentinstancename,
+                'timeend' => (int) $ue->timeend,
+                'canedit' => $this->caneditinstance[$instanceid],
+            ];
+        }
+        return $items;
+    }
+
+    /**
+     * Returns one end date text per enrolment of a loaded user, e.g. "Manual enrolments: 10 December 2026".
+     *
+     * Empty without moodle/course:enrolreview.
+     *
+     * @param int $userid User id.
+     * @return string[]
+     */
+    public function get_timeend_texts(int $userid): array {
+        $texts = [];
+        foreach ($this->get_timeend_items($userid) as $item) {
+            $texts[] = get_string('enrolmentstatustext', 'report_fastparticipants', (object) [
+                'instance' => $item['instancename'],
+                'status' => $item['timeend'] ? userdate($item['timeend']) : get_string('noenrolmentend', 'report_fastparticipants'),
+            ]);
+        }
+        return $texts;
     }
 
     /**

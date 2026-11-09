@@ -24,9 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026110301;                // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2026110900;                // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2024100700;               // Requires this Moodle version (4.5).
 $plugin->component = 'report_fastparticipants'; // Full name of the plugin (used for diagnostics).
 $plugin->supported = [405, 405];               // Supported Moodle versions (branch numbers).
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0.0';
+$plugin->release   = '1.1.0';

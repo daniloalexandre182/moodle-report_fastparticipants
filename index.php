@@ -218,6 +218,9 @@ if ($total > 0) {
 // Outside the total check so a toast stored after unenrolling the last matching user is shown (and cleared) now.
 if (has_capability('moodle/course:enrolreview', $context)) {
     $PAGE->requires->js_call_amd('report_fastparticipants/status_field', 'init', [['uniqueid' => $table->uniqueid]]);
+    if ($total > 0) {
+        $PAGE->requires->js_call_amd('report_fastparticipants/timeend_field', 'init');
+    }
 }
 
 echo html_writer::end_div();
